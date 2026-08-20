@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>디스코팡팡 럭키박스</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3174/3174175.png">
+<title>럭키박스</title>
 <style>
   :root {
     --bg-dark: #090014;
@@ -358,7 +361,6 @@
     box-shadow: 0 0 15px #00f3ff;
   }
 
-  /* 캔버스 */
   canvas#confettiCanvas {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -389,7 +391,6 @@
 
 <button type="button" class="btn-open" id="openBtn">OPEN!</button>
 
-<!-- 당첨 결과 모달 -->
 <div class="result-overlay" id="resultModal">
   <div class="result-card">
     <div class="result-title">🎉 당첨 결과 🎉</div>
@@ -398,7 +399,6 @@
   </div>
 </div>
 
-<!-- 설정 모달 -->
 <div class="settings-modal" id="settingsModal">
   <div class="settings-card">
     <div class="settings-head">
@@ -420,29 +420,30 @@
 <canvas id="confettiCanvas"></canvas>
 
 <script>
-// 초기 데이터 세팅
+// ⭐ 여기가 사장님 맞춤형으로 고정된 기본 세팅입니다. ⭐
 var defaultItems = [
-  { name: '1등 대박선물', weight: 1 },
-  { name: '2등 무선이어폰', weight: 3 },
-  { name: '3등 스타벅스', weight: 6 },
-  { name: '다음 기회에 (꽝)', weight: 10 }
+  { name: '무료 탑승 티켓', weight: 50 },
+  { name: '인생네컷 촬영권', weight: 5 },
+  { name: 'DJ/직원 호출권', weight: 5 },
+  { name: '증명사진 촬영권', weight: 5 },
+  { name: '다음 기회에 (꽝)', weight: 1 }
 ];
 
+// 접속할 때마다 항상 위 설정값으로 시작하도록 덮어쓰기 방지
 var items = defaultItems;
+var storageKey = 'lucky_box_items_v2'; // 캐시 방지용 이름 변경
 
-// LocalStorage 에러 방지용 안전 로드
 try {
-  var saved = localStorage.getItem('disco_box_items');
+  var saved = localStorage.getItem(storageKey);
   if (saved) {
     items = JSON.parse(saved);
   }
 } catch (e) {
-  console.log('Storage access restricted, using memory items.');
+  console.log('Storage error');
 }
 
 var isOpening = false;
 
-// 토스트 메시지
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.innerText = msg;
@@ -450,7 +451,6 @@ function showToast(msg) {
   setTimeout(function() { t.style.display = 'none'; }, 2000);
 }
 
-// 상자 열기 로직
 function handleOpenBox() {
   if (isOpening) return;
   isOpening = true;
@@ -494,7 +494,6 @@ function pickWinner() {
   return items[items.length - 1].name;
 }
 
-// 설정창 관리
 function openSettings() {
   renderSettingsList();
   document.getElementById('settingsModal').style.display = 'flex';
@@ -516,7 +515,6 @@ function renderSettingsList() {
     list.appendChild(row);
   });
 
-  // 삭제 버튼 이벤트 바인딩
   var delBtns = list.querySelectorAll('.btn-del');
   delBtns.forEach(function(btn) {
     btn.onclick = function() {
@@ -549,14 +547,13 @@ function saveSettings() {
 
   items = updatedItems;
   try {
-    localStorage.setItem('disco_box_items', JSON.stringify(items));
+    localStorage.setItem(storageKey, JSON.stringify(items));
   } catch (e) {}
 
   showToast('설정이 적용되었습니다!');
   closeSettings();
 }
 
-// 파티클(폭죽) 애니메이션
 var pCanvas = document.getElementById('confettiCanvas');
 var pCtx = pCanvas.getContext('2d');
 var particles = [];
@@ -614,7 +611,6 @@ function explodeParticles() {
   update();
 }
 
-// 명시적 이벤트 리스너 등록
 document.getElementById('openBtn').addEventListener('click', handleOpenBox);
 document.getElementById('boxWrap').addEventListener('click', handleOpenBox);
 document.getElementById('settingBtn').addEventListener('click', openSettings);
